@@ -30,6 +30,11 @@ function ensureDb(req, res, next) {
   next();
 }
 
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
 
 app.listen(app.get("port"), () => {
   console.log(`Server running on http://localhost:${app.get("port")}`);
