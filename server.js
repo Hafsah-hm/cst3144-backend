@@ -59,6 +59,15 @@ function ensureDb(req, res, next) {
   next();
 }
 
+app.get("/images/:imageName", (req, res) => {
+  const filePath = path.join(__dirname, "images", req.params.imageName);
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
+    if (err) return res.status(404).json({ error: "Image not found" });
+    res.sendFile(filePath);
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("API running. Try GET /lessons");
 });
