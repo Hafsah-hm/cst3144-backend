@@ -30,6 +30,19 @@ function ensureDb(req, res, next) {
   next();
 }
 
+app.get("/", (req, res) => {
+  res.send("API running. Try GET /lessons");
+});
+
+app.get("/lessons", ensureDb, (req, res, next) => {
+  db.collection("lessons")
+    .find({})
+    .toArray((err, results) => {
+      if (err) return next(err);
+      res.json(results);
+    });
+});
+
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
   res.status(500).json({ error: "Internal Server Error" });
