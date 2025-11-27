@@ -43,6 +43,24 @@ app.get("/lessons", ensureDb, (req, res, next) => {
     });
 });
 
+app.post("/orders", ensureDb, (req, res, next) => {
+  const order = req.body || {};
+
+  // Expect: { name, phone, lessons: [{id, qty}, ...] }
+  if (!order.name || !order.phone || !Array.isArray(order.lessons)) {
+    return res.status(400).json({
+      error:
+        "Invalid order. Provide {name, phone, lessons:[{id,qty}, ...]}",
+    });
+  }
+
+  db.collection("orders").insertOne(order, (err, result) => {
+    if (err) return next(err);
+    console.log("Order inserted:", result.insertedId);
+    res.status(201).json({ message: "Order Saved", orderId: result.insertedId });
+  });
+});
+
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
   res.status(500).json({ error: "Internal Server Error" });
