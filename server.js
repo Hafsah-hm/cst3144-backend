@@ -43,6 +43,26 @@ app.get("/lessons", ensureDb, (req, res, next) => {
     });
 });
 
+app.put("/lessons/:id", ensureDb, (req, res, next) => {
+  const lessonId = parseInt(req.params.id, 10);
+
+  if (Number.isNaN(lessonId)) {
+    return res.status(400).json({ error: "Lesson ID must be a number" });
+  }
+
+  db.collection("lessons").updateOne(
+    { id: lessonId },       // numeric id field in your documents
+    { $set: req.body },
+    (err, result) => {
+      if (err) return next(err);
+      if (!result.matchedCount) {
+        return res.status(404).json({ msg: "Lesson not found" });
+      }
+      res.json({ msg: "success", modified: result.modifiedCount });
+    }
+  );
+});
+
 app.post("/orders", ensureDb, (req, res, next) => {
   const order = req.body || {};
 
