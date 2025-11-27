@@ -11,6 +11,16 @@ const app = express();
 app.use(express.json());
 app.set("port", 3000);
 
+app.use((req, res, next) => {
+  const now = new Date().toISOString();
+  console.log(`[${now}] ${req.method} ${req.url}`);
+  if (Object.keys(req.body || {}).length > 0) {
+    console.log("  Body:", req.body);
+  }
+  next();
+});
+
+
 let db;
 
 MongoClient.connect(
