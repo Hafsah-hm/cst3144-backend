@@ -124,6 +124,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 app.listen(app.get("port"), () => {
   console.log(`Server running on http://localhost:${app.get("port")}`);
