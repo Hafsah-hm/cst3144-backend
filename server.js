@@ -119,6 +119,45 @@ app.post("/orders", ensureDb, (req, res, next) => {
   });
 });
 
+// SEARCH /search?q=...  (backend full-text style search)
+app.get("/search", ensureDb, (req, res, next) => {
+  // 1. Get the query and make it lowercase
+  const q = (req.query.q || "").toLowerCase().trim();
+
+  console.log(" Search Request received for:", q);
+
+  db.collection("lessons")
+    .find({})
+    .toArray((err, results) => {
+      if (err) return next(err);
+
+      // 2. If query is empty, return everything
+      if (!q) {
+        return res.json(results);
+      }
+
+      // 3. Filter the results in Node.js
+      const filtered = results.filter((lesson) => {
+        // Safe check for fields (in case some are missing in DB)
+        const title = (lesson.title || "").toLowerCase();
+        const location = (lesson.Location || "").toLowerCase(); // Note: Capital 'L' to match your DB
+        const price = String(lesson.price || "");
+        const spaces = String(lesson.availableInventory || "");
+
+        // Check if ANY field contains the search text
+        return (
+          title.includes(q) ||
+          location.includes(q) ||
+          price.includes(q) ||
+          spaces.includes(q)
+        );
+      });
+
+      console.log(`Found ${filtered.length} matches for "${q}"`);
+      res.json(filtered);
+    });
+});
+
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
   res.status(500).json({ error: "Internal Server Error" });

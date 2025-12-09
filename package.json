@@ -2,7 +2,7 @@
     "name": "static-file-fun",
     "private": true,
     "scripts": {
-        "start": "nodeman app.js"
+        "start": "node server.js"
     },
     "dependencies": {
         "express": "^5.1.0",
